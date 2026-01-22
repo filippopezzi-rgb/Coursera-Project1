@@ -11,7 +11,7 @@ table = soup.find('table')
 rows = table.find_all('tr')
 languages = []
 salaries = []
-for row in rows[1:]:  # Skip header row
+for row in rows[1:]:
     cols = row.find_all('td')
     if cols:
         languages.append(cols[1].text.strip())

@@ -21,9 +21,10 @@ def get_number_of_jobs_L(location):
     number_of_jobs = len(df_filtered)
     return location,number_of_jobs
 
-location, count1 = get_number_of_jobs_L("New York")
+location, count1 = get_number_of_jobs_L("Los Angeles")
 print(f"Location: {location}, Number of jobs: {count1}")
 
+#Count the number of jobs for each technology in the provided list.
 tech_list = ["C#", "C","Python", "Java", "JavaScript", "C++", "SQL", "Spark", "Hadoop", "Tableau", "Power BI", "Scala", "Oracle", "SQL Server", "MySQLServer", "MongoDB", "PostgreSQL"]
 
 final_results = []
@@ -35,5 +36,6 @@ for technology in tech_list:
 df_final = pd.DataFrame(final_results)
 print(df_final)
 
+#Save to Excel
 df_final.to_excel("job-postings.xlsx", index=False)
 
