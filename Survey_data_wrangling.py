@@ -1,5 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 url = "https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/VYPrOu0Vs3I0hKLLjiPGrA/survey-data-with-duplicate.csv"
 df = pd.read_csv(url)
@@ -103,9 +105,19 @@ missing_values = df_cleaned.isnull().sum()
 print("\nMissing values in cleaned dataset:")
 print(missing_values[missing_values > 0])
 
+#Visualize missing values using a heatmap
+plt.figure(figsize=(12, 8))
+sns.heatmap(df_cleaned.isnull(), cbar=False, cmap='viridis')
+plt.title('Missing Values Heatmap')
+plt.xlabel('Columns')
+plt.ylabel('Rows')
+plt.tight_layout()
+plt.savefig('missing_values_heatmap.png')
+plt.show()
+
 #Impute missing values in EdLevel with the most frequent value
 mode_edlevel = df_cleaned['EdLevel'].mode()[0]
-df_cleaned['EdLevel'].fillna(mode_edlevel, inplace=True)
+df_cleaned['EdLevel'] = df_cleaned['EdLevel'].fillna(mode_edlevel)
 print(f"\nImputed missing values in EdLevel with: {mode_edlevel}")
 
 #Check missing values again after imputation
@@ -139,7 +151,40 @@ plt.tight_layout()
 plt.savefig('compensation_distribution.png')
 plt.show()
 
+#Normalize ConvertedCompYearly using Min-Max Scaling
+scaler = MinMaxScaler()
+df_cleaned['ConvertedCompYearly_Normalized'] = scaler.fit_transform(df_cleaned[['ConvertedCompYearly']])
+print("\nConvertedCompYearly has been normalized using Min-Max Scaling.")
+print(f"Normalized values range: {df_cleaned['ConvertedCompYearly_Normalized'].min()} to {df_cleaned['ConvertedCompYearly_Normalized'].max()}")
 
+#Apply Z-score Normalization to ConvertedCompYearly
+scaler_z = StandardScaler()
+df_cleaned['ConvertedCompYearly_Zscore'] = scaler_z.fit_transform(df_cleaned[['ConvertedCompYearly']])
+print("\nConvertedCompYearly has been standardized using Z-score Normalization.")
+print(f"Z-score values mean: {df_cleaned['ConvertedCompYearly_Zscore'].mean():.6f}")
+print(f"Z-score values std: {df_cleaned['ConvertedCompYearly_Zscore'].std():.6f}")
+
+#Visualize distributions of ConvertedCompYearly, Normalized, and Z-score
+fig, axes = plt.subplots(1, 3, figsize=(18, 6))
+
+df_cleaned['ConvertedCompYearly'].plot(kind='hist', bins=50, ax=axes[0], color='skyblue', edgecolor='black')
+axes[0].set_title('Original ConvertedCompYearly Distribution')
+axes[0].set_xlabel('Annual Compensation (USD)')
+axes[0].set_ylabel('Frequency')
+
+df_cleaned['ConvertedCompYearly_Normalized'].plot(kind='hist', bins=50, ax=axes[1], color='lightgreen', edgecolor='black')
+axes[1].set_title('Min-Max Normalized Distribution')
+axes[1].set_xlabel('Normalized Value [0,1]')
+axes[1].set_ylabel('Frequency')
+
+df_cleaned['ConvertedCompYearly_Zscore'].plot(kind='hist', bins=50, ax=axes[2], color='salmon', edgecolor='black')
+axes[2].set_title('Z-score Standardized Distribution')
+axes[2].set_xlabel('Z-score')
+axes[2].set_ylabel('Frequency')
+
+plt.tight_layout()
+plt.savefig('compensation_distributions_comparison.png')
+plt.show()
 
 
 
